@@ -1,1 +1,3 @@
-pvIY=:6PRjT!
+cd /usr/local/mysql/bin
+
+./mysql -u root -h localhost -p
