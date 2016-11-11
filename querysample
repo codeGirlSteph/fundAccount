@@ -1,0 +1,74 @@
+<script>
+var transactions = [
+	{date: "10/14/2016", type: "debit", category: "cash", amount: 1300.00, fee: 4.00},
+	{date: "10/17/2016", type: "credit", category: "cash", amount: 500.34, fee: 2.45},
+	{date: "10/18/2016", type: "credit", category: "other", amount: 1000.00, fee: 3.12},
+	{date: "10/19/2016", type: "debit", category: "short", amount: 1300.00, fee: 4.10},
+	{date: "10/20/2016", type: "credit", category: "short", amount: 100.00, fee: 5.22},
+	{date: "10/21/2016", type: "debit", category: "short", amount: 3700.00, fee: 9.15}
+];
+
+function getMatchingTransactions(query)
+{
+	var matches = [];
+	for(var id in transactions)
+	{
+		var matched = true;
+		var transaction = transactions[id];
+		for(var key in query)
+		{
+			if(query[key] != transaction[key])
+			{
+				matched = false;
+				break;
+			}
+		}
+		
+		if(matched)
+		{
+			matches.push(transactions[id]);
+		}
+	}
+	return matches;
+}
+
+function getSum(transactions, columnName)
+{
+	var total = 0;
+	for(var id in transactions)
+	{
+		total += transactions[id][columnName];
+	}
+	return total;
+}
+
+function getAverage(transactions, columnName)
+{
+	var total = 0;
+	for(var id in transactions)
+	{
+		total += transactions[id][columnName];
+	}
+	return total / transactions.length;
+}
+
+// Query the data
+var debitTransactions = getMatchingTransactions({type: "debit"});
+var cashDebitTransactions = getMatchingTransactions({type: "debit", category: "cash"});
+var allTransactions = getMatchingTransactions({});
+
+// Analyze the data
+var totalDebits = getSum(debitTransactions, "amount");
+var totalCashDebits = getSum(cashDebitTransactions, "amount");
+var totalCashDebitFees = getSum(cashDebitTransactions, "fee");
+var totalFees = getSum(allTransactions, "fee");
+var averageTransactionFee = getAverage(allTransactions, "fee");
+var averageTransactionSize = getAverage(allTransactions, "amount");
+
+// Show the results
+console.log("There are " + debitTransactions.length + " debit transactions totaling up to $" + totalDebits);
+console.log("There are " + cashDebitTransactions.length + " cash debit transactions totaling up to $" + totalCashDebits);
+console.log("There are " + cashDebitTransactions.length + " cash debit transactions with fees totaling up to $" + totalCashDebitFees);
+console.log("There are " + allTransactions.length + " total transactions totaling up to $" + totalFees);
+console.log("The average transaction size is $" + averageTransactionSize + " with a fee of $" + averageTransactionFee);
+</script>
