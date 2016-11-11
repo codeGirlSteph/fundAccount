@@ -1,0 +1,33 @@
+<html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+  <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+</head>
+<body>
+<h2>Transaction Search</h2>
+<div class="container">
+<button onclick ="addFilter()">Add Filter</button>
+<br><br>
+<label>Filter by</label>
+<div id="filter" ></div>
+<button id="viewQueryResults">View Query Results</button>
+</div>
+<script>
+
+var test = '<div><select class="col-xs-3 input-sm"><option></option><option id="quantity">Quantity</option> <option id="tradeDate">Trade Date</option><option id="pricePerShare">Price Per Share</option> <option id="security">Security</option></select><select class="col-xs-3 input-sm"><option></option<option id="equals">Equals</option><option id="doesNotEqual">Does Not Equal</option><option id="isGreaterThan">Is Greater Than</option><option id="isLessThan">Is Less Than</option><option id="contains">Contains</option></select><input class="col-xs-3 input-sm" ><button id="remove">Remove</button></div><br>'
+
+
+function addFilter(){
+document.getElementById("filter").innerHTML += test;
+
+}
+
+
+
+
+</script>
+</body>
+</html>
