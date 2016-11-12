@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+
+
+<script>
+var transactions = [
+                {tranId:1529, tradeDate: "10/14/2016", quantity: 1000.00, category: "cash", pricePerShare: 25.00, security: "equity"},
+                {tranId:5688,tradeDate: "10/17/2016", quantity: 1000.00, category: "cash", pricePerShare: 30.00, security: "bond"},
+                {tranId:9875,tradeDate: "10/18/2016", quantity: 5600.00, category: "other", pricePerShare: 40.00, security: "equity"},
+                {tranId:9854,tradeDate: "10/19/2016", quantity: 2000.00, category: "short", pricePerShare: 50.00, security: "equity"},
+                {tranId:6788,tradeDate: "10/20/2016", quantity: 4800.00, category: "short", pricePerShare: 15.00, security: "bond"},
+                {tranId:9764,tradeDate: "10/21/2016", quantity: 3000.00, category: "short", pricePerShare: 70.00, security: "equity"}
+];
+
+
+function getMatchingTransactions(query)
+{
+ var matches = [];
+ for(var id in transactions)
+ {
+  var matched = true;
+  var transaction = transactions[id];
+  for(var key in query)
+  {
+   if(query[key] != transaction[key])
+   {
+    matched = false;
+    break;
+   }
+  }
+  
+  if(matched)
+  {
+   matches.push(transactions[id]);
+  }
+ }
+ return matches;
+}
+
+
+
+// Query the data
+var debitTransactions = getMatchingTransactions({quantity: 1000.00});
+var cashDebitTransactions = getMatchingTransactions({quantity: 1000.00, category: "cash"});
+var allTransactions = getMatchingTransactions({});
+
+
+// return matching objects
+console.log(debitTransactions);
+console.log(cashDebitTransactions.length);
+console.log(allTransactions.length);
+
+</script>
+
+
+</body>
+</html>
