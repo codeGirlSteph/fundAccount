@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<style>
+.assetAccounts{
+background-color: lightblue;
+font-size: 12px;
+}
+.liabilityAccounts{
+background-color: lightpink;
+font-size: 12px;
+}
+.parentAccounts{
+background-color: lightyellow;
+font-size: 18px;
+}
+</style>
+
+</head>
+<body>
+
+<div class="container">
+<h2>Accounting</h2>
+<form>
+<div class="form-group">
+<label>Debit</label>
+<input type="text" class="form-control" id="debitIn">
+</div>
+
+<div class="dropdown">
+<button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Submit
+<span class="caret"></span></button>
+<ul class="dropdown-menu">
+<li> <button onclick="loadDebit('investmentsLong')" class="btn btn-default btn-block" />InvestmentsLong</li>
+<li> <button onclick="loadDebit('cashLong')" class="btn btn-default btn-block"> Cash Long</button></li>
+<li> <button onclick="loadDebit('receivables')" class="btn btn-default btn-block"> Receivables</button></li>
+<li> <button onclick="loadDebit('otherAssets')"class="btn btn-default btn-block"> Other Assets</button></li>
+</ul>
+</div>
+<br>
+<div class="form-group">
+<label>Credit</label>
+<input type="text" class="form-control" id="creditIn">
+</div>
+
+<div class="dropdown">
+<button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Submit
+<span class="caret"></span></button>
+<ul class="dropdown-menu">
+
+<li> <button onclick="loadCredit('investmentShort')" class="btn btn-default btn-block">Investments Short </button></li>
+<li> <button onclick="loadCredit('cashShort')"class="btn btn-default btn-block">Cash Short</button></li>
+<li> <button onclick="loadCredit('payables')"class="btn btn-default btn-block">Payables</button></li>
+<li> <button onclick="loadCredit('otherLiabilities')"class="btn btn-default btn-block">Other Liabilities</button></li>
+</ul>
+</div>
+
+</form>
+</div>
+
+<h2>Balance Sheet</h2>
+
+<table class="table">
+<thead>
+<tr>
+<th>Account Title</th>
+<th>Debits</th>
+<th>Credits</th>
+<th>Owner's Equity</th>
+</tr>
+<tr class="parentAccounts">
+<th>Assets</th>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</thead>
+<tbody>
+<tr class ="assetAccounts">
+<th >Investments Long</th>
+<td id ="investmentsLongDebitOut" >0</td>
+<td id ="investmentsLongCreditOut" >0</td>
+<td id ="investmentsLongSum" >0</td>
+</tr>
+<tr class ="assetAccounts">
+<th >Cash Long</th>
+<td id = "cashDebitOut">0</td>
+<td id = "cashCreditOut">0</td>
+<td id ="cashLongSum">0</td>
+</tr>
+<tr class ="assetAccounts">
+<th>Receivables</th>
+<td id ="receivablesDebitOut">0</td>
+<td id ="receivablesCreditOut">0</td>
+<td id ="receivablesSum">0</td>
+</tr>
+<tr class ="assetAccounts">
+<th>Other Assets</th>
+<td id ="otherAssetsDebitOut">0</td>
+<td id ="otherAssetsCreditOut">0</td>
+<td id ="otherAssetsSum">0</td>
+</tr>
+<tr class="parentAccounts">
+<th>Liabilities</th>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+
+<tr class ="liabilityAccounts">
+<th >Investments Short</th>
+<td id ="investmentShortDebitOut">0</td>
+<td id ="investmentShortCreditOut">0</td>
+<td id ="investmentShortSum">0</td>
+</tr>
+<tr class ="liabilityAccounts">
+<th >Cash Short</th>
+<td id ="cashShortDebitOut">0</td>
+<td id ="cashShortCreditOut">0</td>
+<td id ="cashShortSum">0</td>
+</tr>
+<tr class ="liabilityAccounts">
+<th >Payables</th>
+<td id ="payablesDebitOut">0</td>
+<td id ="payablesCreditOut">0</td>
+<td id ="payablesSum">0</td>
+</tr>
+<tr class ="liabilityAccounts">
+<th >Other Liabilities</th>
+<td id ="otherLiabilitiesDebitOut">0</td>
+<td id ="otherLiabilitiesCreditOut">0</td>
+<td id ="otherLiabilitiesSum">0</td>
+</tr>
+<tr>
+<th>Owner's Equity</th>
+<td id ="totalDebit">0</td>
+<td id ="totalCredit">0</td>
+<td id ="ownersEquity">0</td>
+</tr>
+</tbody>
+</table>
+</div>
+<script>
+
+
+
+var debitMap = {
+
+investmentsLong : "investmentsLongDebitOut",
+cashLong : "cashDebitOut",
+receivables : "receivablesDebitOut",
+otherAssets : "otherAssetsDebitOut",
+investmentShort : "investmentShortDebitOut",
+cashShort : "cashShortDebitOut",
+payables : "payablesDebitOut",
+otherLiabilities : "otherLiabilitiesDebitOut"
+
+}
+
+var creditMap = {
+
+investmentsLong : "investmentsLongCreditOut",
+cashLong : "cashCreditOut",
+receivables : "receivablesCreditOut",
+otherAssets : "otherAssetsCreditOut",
+investmentShort : "investmentShortCreditOut",
+cashShort : "cashShortCreditOut",
+payables : "payablesCreditOut",
+otherLiabilities : "otherLiabilitiesCreditOut"
+
+
+}
+
+var sumDebitCredit = {
+
+investmentsLong : "investmentsLongSum",
+cashLong : "cashLongSum",
+receivables : "receivablesSum",
+otherAssets : "otherAssetsSum",
+investmentShort : "investmentShortSum",
+cashShort : "cashShortSum",
+payables : "payablesSum",
+otherLiabilities : "otherLiabilitiesSum"
+
+
+
+}
+// get user input
+function getElementValue(elementId){
+return parseInt(document.getElementById(elementId).value);
+}
+// get element Id
+function getElement(elementId){
+return document.getElementById(elementId);
+}
+
+//maps user debit input to element Id output
+function loadDebit(type){
+
+getElement(debitMap[type]).innerHTML=getElementValue("debitIn");
+calculateBalance(type);
+calculateTotalDebit(type);
+calculateOwnersEquity();
+
+event.preventDefault();
+}
+
+//maps user credit input to element Id output
+function loadCredit(type){
+
+getElement(creditMap[type]).innerHTML=getElementValue("creditIn");
+
+calculateBalance(type);
+calculateTotalCredit();
+calculateOwnersEquity();
+event.preventDefault();
+}
+
+
+ // sums together debits and credits
+function calculateBalance(type){
+
+getElement(sumDebitCredit[type]).innerHTML = parseInt(getElement(debitMap[type]).innerHTML)+parseInt(getElement(creditMap[type]).innerHTML);
+event.preventDefault();
+
+
+}
+
+//sums all debits
+function calculateTotalDebit(){
+
+var sum = 0;
+for(var key in debitMap){
+sum += parseInt(getElement(debitMap[key]).innerHTML);
+}
+document.getElementById("totalDebit").innerHTML = sum;
+
+event.preventDefault();
+}
+// sums all credits
+function calculateTotalCredit(){
+
+var sum = 0;
+for(var key in creditMap){
+sum += parseInt(getElement(creditMap[key]).innerHTML);
+}
+
+document.getElementById("totalCredit").innerHTML = sum;
+
+event.preventDefault();
+}
+
+//debits minus credits
+function calculateOwnersEquity(){
+
+document.getElementById("ownersEquity").innerHTML = parseInt(getElement("totalDebit").innerHTML)-parseInt(getElement("totalCredit").innerHTML);
+
+event.preventDefault();
+}
+</script>
+
+</body>
+</html>
