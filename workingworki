@@ -1,0 +1,148 @@
+<html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+  <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+</head>
+<body>
+<h2>Transaction Search</h2>
+<div class="container">
+<button onclick ="addFilter()">Add Filter</button>
+<br><br>
+<label>Filter by</label>
+<div id="filterDiv" ></div>
+<button onclick ="viewQueryResults()">View Query Results</button>
+<div id="queryResults"></div>
+</div>
+<p id="demo"></p>
+<p id="demo1"></p>
+<script>
+
+var filter = '<div><select id="key" onchange="selectKey()" class="col-xs-3 input-sm"><option></option><option value="quantity">Quantity</option> <option value="tradeDate">Trade Date</option> <option value="pricePerShare">Price Per Share</option><option value="security">Security Type</option></select><select id="operator" onchange="selectOperator()" class="col-xs-3 input-sm"><option></option><option value="equals">Equals</option><option value="isGreaterThan">Is Greater Than</option><option value="isLessThan">Is Less Than</option></select><input class="col-xs-3 input-sm" id="inputValue" oninput="getInputValue()"><button onclick ="removeFilter()">Remove</button></div><br>'
+
+var transactionsDatabase = [
+{tranId:1529, tradeDate: "10/14/2016", quantity: 1000.00, category: "cash", pricePerShare: 25.00, security: "equity"},
+{tranId:5688,tradeDate: "10/17/2016", quantity: 1500.00, category: "cash", pricePerShare: 30.00, security: "bond"},
+{tranId:9875,tradeDate: "10/18/2016", quantity: 5600.00, category: "other", pricePerShare: 40.00, security: "equity"},
+{tranId:9854,tradeDate: "10/19/2016", quantity: 2000.00, category: "short", pricePerShare: 50.00, security: "equity"},
+{tranId:6788,tradeDate: "10/20/2016", quantity: 4800.00, category: "short", pricePerShare: 15.00, security: "bond"},
+{tranId:9764,tradeDate: "10/21/2016", quantity: 3000.00, category: "short", pricePerShare: 70.00, security: "equity"}
+];
+
+
+function addFilter(){
+document.getElementById("filterDiv").innerHTML += filter;
+
+
+}
+
+
+
+function removeFilter(){
+
+var filterDiv = document.getElementById("filterDiv");
+
+filterDiv.removeChild(filterDiv.lastChild);
+filterDiv.removeChild(filterDiv.lastChild);
+
+}
+
+
+var keyType;
+
+function selectKey () {
+
+keyType = document.getElementById("key").value;
+
+return keyType;
+
+}
+
+
+var inputValue;
+function getInputValue (){
+
+inputValue = document.getElementById("inputValue").value;
+return inputValue;
+}
+
+
+var Filter = function (transactionsDatabase)
+{
+this.transactionsDatabase = transactionsDatabase;
+
+this.equals = function(key, value)
+    {
+       var transactionsDatabase = [];
+       for(var i in this.transactionsDatabase)
+       {
+          var transaction = this.transactionsDatabase[i];
+          if(transaction[key] == value)
+             {
+                transactionsDatabase.push(transaction);
+             }
+       }
+       return new Filter(transactionsDatabase);
+   },
+this.isGreaterThan = function(key, value)
+     {
+        var transactionsDatabase = [];
+        for(var i in this.transactionsDatabase)
+        {
+           var transaction = this.transactionsDatabase[i];
+           if(transaction[key] > value)
+             {
+                transactionsDatabase.push(transaction);
+             }
+        }
+  return new Filter(transactionsDatabase);
+    },
+this.isLessThan = function(key, value)
+    {
+       var transactionsDatabase = [];
+       for(var i in this.transactionsDatabase)
+       {
+          var transaction = this.transactionsDatabase[i];
+          if(transaction[key] < value)
+            {
+               transactionsDatabase.push(transaction);
+            }
+       }
+  return new Filter(transactionsDatabase);
+
+   }
+}
+
+
+var matches = new Filter(transactionsDatabase);
+
+
+function viewQueryResults(){
+
+var operator = document.getElementById("operator").value;
+var operation;
+switch(operator) {
+	case "equals":
+    	operation = matches.equals;
+        break;
+    case "isGreaterThan":
+    	operation = matches.isGreaterThan;
+        break;
+    case "isLessThan":
+    	operation = matches.isLessThan;
+        break;
+    default:
+    	console.log("unknown operator" + operator);
+        break;
+}
+document.getElementById("queryResults").innerHTML= JSON.stringify(operation(keyType, inputValue));
+
+}
+
+
+
+</script>
+</body>
+</html>
