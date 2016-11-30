@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+
+<select id="key" onchange="selectKey(key)">
+<option value=""></option>
+<option value="quantity">Quantity</option>
+<option value="tradeDate">Trade Date</option>
+<option value="pricePerShare">Price Per Share</option>
+<option value="security">Security Type</option>
+</select>
+
+<select id="operator">
+</select>
+<script>
+
+var keyType;
+
+function selectKey (key) {
+
+configureDropDownLists(key,document.getElementById('operator'));
+keyType = document.getElementById("key").value;
+
+return keyType;
+
+
+}
+
+
+
+function configureDropDownLists(key,operator) {
+    var stringOperator = ['Equals'];
+    var numberOperators = ['Equals','Is Greater Than', 'Is Less Than'];
+   
+switch(key.value)
+{
+
+   case 'quantity':operator.options.length = 0;
+   for (i = 0; i < numberOperators.length; i++) 
+   {
+      createOption(operator, numberOperators[i],numberOperators[i],numberOperators[i]);
+   }
+break;
+
+   case 'tradeDate':operator.options.length = 0;
+   for (i = 0; i < numberOperators.length; i++) 
+   {
+      createOption(operator, numberOperators[i],    numberOperators[i],numberOperators[i]);
+
+   }
+break;
+ 
+     case 'pricePerShare':operator.options.length = 0;
+   for (i = 0; i < numberOperators.length; i++) 
+   {
+      createOption(operator, numberOperators[i],    numberOperators[i],numberOperators[i]);
+
+   }
+break;
+ 
+     case 'security':operator.options.length = 0;
+   for (i = 0; i < stringOperator.length; i++) 
+   {
+      createOption(operator, stringOperator[i]);
+
+   }
+break;
+      default:
+                operator.options.length = 0;
+            break;
+    }
+
+    
+
+
+}
+
+function createOption(key, text, value) {
+        var opt = document.createElement('option');
+        opt.value = value;
+        opt.text = text;
+        key.options.add(opt);
+   }
+   </script>
+</body>
+</html> 
