@@ -1,0 +1,213 @@
+<html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
+</head>
+<body>
+<h2>Transaction Search</h2>
+<div class="container">
+<button onclick ="addFilter()">Add Filter</button>
+<br><br>
+<label>Filter by</label>
+<div id="filterDiv" ></div>
+<button onclick ="viewQueryResults()">View Query Results</button>
+<div id="queryResults"></div>
+</div>
+
+<script>
+
+var filter = '<div><select id="key" onchange="selectKey(key)" class="col-xs-3 input-sm"><option></option><option value="quantity">Quantity</option> <option value="tradeDate">Trade Date (YYYY-MM-DD)</option> <option value="pricePerShare">Price Per Share</option><option value="security">Security Type</option></select><select id="operator" class="col-xs-3 input-sm"></select><input class="col-xs-3 input-sm" id="inputValue" oninput="getInputValue()"><button onclick ="removeFilter()">Remove</button></div><br>'
+
+var transactionsDatabase = [
+{tranId:1529, tradeDate: "2016-10-06", quantity: 1000.00, category: "cash", pricePerShare: 25.00, security: "equity"},
+{tranId:5688,tradeDate: "2016-10-17", quantity: 1500.00, category: "cash", pricePerShare: 30.00, security: "bond"},
+{tranId:9875,tradeDate: "2016-10-18", quantity: 5600.00, category: "other", pricePerShare: 40.00, security: "equity"},
+{tranId:9854,tradeDate: "2016-10-19", quantity: 2000.00, category: "short", pricePerShare: 50.00, security: "equity"},
+{tranId:6788,tradeDate: "2016-10-20", quantity: 4800.00, category: "short", pricePerShare: 15.00, security: "bond"},
+{tranId:9764,tradeDate: "2016-10-21", quantity: 3000.00, category: "short", pricePerShare: 70.00, security: "equity"}
+];
+
+
+function addFilter(){
+document.getElementById("filterDiv").innerHTML += filter;
+
+
+}
+
+
+
+function removeFilter(){
+
+var filterDiv = document.getElementById("filterDiv");
+
+filterDiv.removeChild(filterDiv.lastChild);
+filterDiv.removeChild(filterDiv.lastChild);
+
+}
+
+
+var keyType;
+
+function selectKey (key) {
+
+configureDropDownLists(key,document.getElementById('operator'));
+keyType = document.getElementById("key").value;
+
+return keyType;
+
+}
+
+function configureDropDownLists(key,operator) {
+var stringOperator = ['Equals'];
+var numberOperators = ['Equals','Is Greater Than', 'Is Less Than'];
+
+switch(key.value)
+{
+
+case 'quantity':operator.options.length = 1;
+
+for (i = 0; i < numberOperators.length; i++) 
+{
+createOption(operator, numberOperators[i]);
+}
+break;
+
+case 'tradeDate':operator.options.length = 1;
+for (i = 0; i < numberOperators.length; i++) 
+{
+createOption(operator, numberOperators[i]);
+
+}
+break;
+
+case 'pricePerShare':operator.options.length = 1;
+for (i = 0; i < numberOperators.length; i++) 
+{
+createOption(operator, numberOperators[i]);
+
+}
+break;
+
+case 'security':operator.options.length = 1;
+for (i = 0; i < stringOperator.length; i++) 
+{
+createOption(operator, stringOperator[i]);
+
+}
+break;
+default:
+operator.options.length = 0;
+break;
+}
+
+
+}
+
+var option;
+function createOption(operator, operatorOption) {
+option = document.createElement('option');
+
+option.text = operatorOption;
+operator.options.add(option);
+
+return option;
+}
+
+
+var inputValue;
+function getInputValue (){
+
+inputValue = document.getElementById("inputValue").value;
+if(moment(inputValue, "YYYY-MM-DD", true).isValid()==true){
+var date = inputValue;
+var format = "LLLL";
+var result = moment(date).format(format);}else{ return inputValue};
+return inputValue;
+}
+
+
+
+var Filter = function (transactionsDatabase)
+{
+this.transactionsDatabase = transactionsDatabase;
+
+this.equals = function(key, value)
+{
+var transactionsDatabase = [];
+for(var i in this.transactionsDatabase)
+{
+var transaction = this.transactionsDatabase[i];
+if(transaction[key] == value)
+{
+transactionsDatabase.push(transaction);
+}
+}
+return new Filter(transactionsDatabase);
+},
+this.isGreaterThan = function(key, value)
+{
+var transactionsDatabase = [];
+for(var i in this.transactionsDatabase)
+{
+var transaction = this.transactionsDatabase[i];
+if(transaction[key] > value)
+{
+transactionsDatabase.push(transaction);
+}
+}
+return new Filter(transactionsDatabase);
+},
+this.isLessThan = function(key, value)
+{
+var transactionsDatabase = [];
+for(var i in this.transactionsDatabase)
+{
+var transaction = this.transactionsDatabase[i];
+if(transaction[key] < value)
+{
+transactionsDatabase.push(transaction);
+}
+}
+return new Filter(transactionsDatabase);
+
+}
+}
+
+
+var matches = new Filter(transactionsDatabase);
+
+
+function viewQueryResults(opt){
+
+var operator = document.getElementById("operator").value;
+
+var operation;
+switch(operator) {
+case "Equals":
+operation = matches.equals;
+break;
+case "Is Greater Than":
+operation = matches.isGreaterThan;
+break;
+case "Is Less Than":
+operation = matches.isLessThan;
+break;
+default:
+console.log("unknown operator" + operator);
+break;
+
+}
+
+document.getElementById("queryResults").innerHTML= JSON.stringify(operation(keyType, inputValue));
+
+
+}
+
+
+
+</script>
+</body>
+</html>
