@@ -1,0 +1,337 @@
+<html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
+</head>
+<body>
+<h2>Transaction Search</h2>
+<div class="container">
+<button onclick ="addFilter()">Add Filter</button>
+<br><br>
+<label>Filter by</label>
+<div id="filterDiv" ></div>
+<button onclick ="viewQueryResults()">View Query Results</button>
+<div id="queryResults"></div>
+</div>
+
+<script type="text/javascript">
+
+
+//create div element container for filter
+var filterContainerDivElement = document.createElement("div");
+
+"use strict";
+
+//creation of first select element elementKeyOriginal
+var elementKeyOriginal = document.createElement("select");
+elementKeyOriginal.setAttribute("class","col-xs-3 input-sm");
+elementKeyOriginal.onchange=function(){ selectKey(elementKeyOriginal)};
+
+//create options for first select element
+var optionBlankElement = document.createElement("option");
+var optionElementQuantity = document.createElement("option");
+optionElementQuantity.setAttribute("value","quantity");
+var textNodeQuantity = document.createTextNode("Quantity");
+optionElementQuantity.appendChild(textNodeQuantity);
+
+var optionElementTradeDate = document.createElement("option");
+optionElementTradeDate.setAttribute("value","tradeDate");
+var textNodeTradeDate = document.createTextNode("Trade Date (YYYY-MM-DD)");
+optionElementTradeDate.appendChild(textNodeTradeDate);
+
+var optionElementPricePerShare = document.createElement("option");
+optionElementPricePerShare.setAttribute("value","pricePerShare");
+var textNodePricePerShare = document.createTextNode("Price Per Share");
+optionElementPricePerShare.appendChild(textNodePricePerShare);
+
+
+
+var optionElementSecurity = document.createElement("option");
+optionElementSecurity.setAttribute("value","security");
+
+
+var textNodeSecurity = document.createTextNode("Security Type");
+optionElementSecurity.appendChild(textNodeSecurity);
+
+
+//create second select element which will have the operators
+var selectElementOperator = document.createElement("select");
+selectElementOperator.setAttribute("class","col-xs-3 input-sm");
+
+
+//create input element which will be next to operators element
+var inputElement = document.createElement("input");
+inputElement.setAttribute("class","col-xs-3 input-sm");
+inputElement.oninput=function(){getInputValue()};
+
+
+//create remove button
+var removeElement = document.createElement("button");
+removeElement.setAttribute("class","col-xs-3 input-sm");
+var textNodeRemoveElement = document.createTextNode("Remove");
+removeElement.appendChild(textNodeRemoveElement);
+removeElement.onclick=function(){removeFilter()};
+
+
+//create break elements to space out the appended filters
+var breakElement = document.createElement("br");
+var breakElement2 = document.createElement("br");
+
+//if div area is empty, insert this, if it is not empty, append to existing 
+function addFilter(){
+
+if(document.getElementById("filterDiv").hasChildNodes()==false){
+document.getElementById("filterDiv").appendChild(filterContainerDivElement);
+filterContainerDivElement.appendChild(elementKeyOriginal); 
+elementKeyOriginal.appendChild(optionBlankElement);
+elementKeyOriginal.appendChild(optionElementQuantity);
+elementKeyOriginal.appendChild(optionElementTradeDate);
+elementKeyOriginal.appendChild(optionElementPricePerShare);
+elementKeyOriginal.appendChild(optionElementSecurity);
+filterContainerDivElement.appendChild(selectElementOperator);
+filterContainerDivElement.appendChild(inputElement);
+filterContainerDivElement.appendChild(removeElement);
+filterContainerDivElement.appendChild(breakElement);
+filterContainerDivElement.appendChild(breakElement2);
+
+}
+
+else if (document.getElementById("filterDiv").childNodes.length<4){
+//clone existing node with everything inside
+var newFilterContainerDivElement=filterContainerDivElement.cloneNode(true);
+//add remove function to clone bc event listeners are not cloned
+var newRemoveButton=newFilterContainerDivElement.childNodes[3];
+newRemoveButton.onclick=function(){removeFilter()};
+//add selectKey function to clone bc event listeners are not cloned
+var newElementKey=newFilterContainerDivElement.childNodes[0];
+newElementKey.onchange=function(){ selectKey(newElementKey)};
+//remove if any, existing input value
+var newInputElement=newFilterContainerDivElement.childNodes[2];
+newInputElement.value = "";
+newInputElement.oninput=function(){getInputValue()};
+
+//append new cloned div node with everything inside
+
+document.getElementById("filterDiv").appendChild(newFilterContainerDivElement);
+
+
+}
+
+
+}
+
+
+
+//database
+var transactionsDatabase = [
+{tranId:1529, tradeDate: "2016-10-06", quantity: 1000.00, category: "cash", pricePerShare: 25.00, security: "equity"},
+{tranId:5688,tradeDate: "2016-10-17", quantity: 1500.00, category: "cash", pricePerShare: 30.00, security: "bond"},
+{tranId:9875,tradeDate: "2016-10-18", quantity: 5600.00, category: "other", pricePerShare: 40.00, security: "equity"},
+{tranId:9854,tradeDate: "2016-10-19", quantity: 2000.00, category: "short", pricePerShare: 50.00, security: "equity"},
+{tranId:6788,tradeDate: "2016-10-20", quantity: 4800.00, category: "short", pricePerShare: 15.00, security: "bond"},
+{tranId:9764,tradeDate: "2016-10-21", quantity: 3000.00, category: "short", pricePerShare: 70.00, security: "equity"}
+];
+
+
+//remove parent node of clicked button
+
+function removeFilter(){
+
+var filterDiv = document.getElementById("filterDiv");
+
+filterDiv.removeChild(event.target.parentNode);
+
+
+};
+
+
+//after user selects and elementKey is defined, execute the following statements
+function selectKey(elementKey){
+configureDropDownLists(elementKey,elementKey.nextElementSibling);
+keyType = elementKey.value;
+elementKeyNextSibling=elementKey.nextElementSibling;
+nextNextElementSibling=elementKeyNextSibling.nextElementSibling;
+return keyType;
+
+}
+
+
+
+//configure the next element's dropdown lists with operators dependent upon what user selects in the first element's dropdown lists
+function configureDropDownLists(elementKey,operator) {
+//create arrays for each possible selection sets
+var stringOperator = ['Equals'];
+var numberOperators = ['Equals','Is Greater Than', 'Is Less Than'];
+//match user selected value to function 
+switch(elementKey.value)
+
+{ 
+
+case 'quantity':operator.options.length = 1;
+
+for (var i = 0; i < numberOperators.length; i++) 
+{
+createOption(operator, numberOperators[i]);
+}
+break;
+
+case 'tradeDate':operator.options.length = 1;
+for (var i = 0; i < numberOperators.length; i++) 
+{
+createOption(operator, numberOperators[i]);
+
+
+}
+break;
+
+case 'pricePerShare':operator.options.length = 1;
+for (var i = 0; i < numberOperators.length; i++) 
+{
+createOption(operator, numberOperators[i]);
+
+}
+break;
+
+case 'security':operator.options.length = 1;
+for (var i = 0; i < stringOperator.length; i++) 
+{
+createOption(operator, stringOperator[i]);
+
+}
+break;
+default:
+operator.options.length = 0;
+break;
+}
+
+
+}
+//creates options based upon user selection, called from function configureDropDownLists
+
+function createOption(operator, operatorOption) {
+option = document.createElement('option');
+
+option.text = operatorOption;
+operator.options.add(option);
+
+return option;
+
+}
+
+//If user inputs a date in YYYY-MM-DD format, parse this as a date, not a decimal
+
+function getInputValue (){
+
+inputValue = nextNextElementSibling.value;
+if(moment(inputValue, "YYYY-MM-DD", true).isValid()==true){
+moment(inputValue).format("LLLL")};
+return inputValue;
+}
+
+
+//filters database according to elementKey(key) and operator(value) selections 
+var Filter = function(transactionsDatabase)
+{
+this.transactionsDatabase = transactionsDatabase;
+}
+Filter.prototype =
+{
+equals: function(key, value)
+{
+var transactionsDatabase = [];
+for(var i in this.transactionsDatabase)
+{
+var transaction = this.transactionsDatabase[i];
+if(transaction[key] == value)
+{
+transactionsDatabase.push(transaction);
+}
+}
+return new Filter(transactionsDatabase);
+},
+
+isGreaterThan: function(key, value)
+{
+var transactionsDatabase = [];
+for(var i in this.transactionsDatabase)
+{
+var transaction = this.transactionsDatabase[i];
+if(transaction[key] > value)
+{
+transactionsDatabase.push(transaction);
+}
+}
+return new Filter(transactionsDatabase);
+},
+
+isLessThan: function(key, value)
+{
+var transactionsDatabase = [];
+for(var i in this.transactionsDatabase)
+{
+var transaction = this.transactionsDatabase[i];
+if(transaction[key] < value)
+{
+transactionsDatabase.push(transaction);
+}
+}
+return new Filter(transactionsDatabase);
+}
+}
+
+
+
+//evaluate and reevaluate the filters currently present on the page, in case some filters were removed
+
+var numberOfCurrentFilters = document.getElementById("filterDiv").childNodes.length;
+
+var currentFilters = document.getElementById("filterDiv").childNodes;
+
+
+
+
+function viewQueryResults(){
+
+var currentFilters = document.getElementById("filterDiv").childNodes;
+
+var matches = new Filter(transactionsDatabase);
+
+for(var i = 0; i < currentFilters.length; i++)
+{
+var currentNode = currentFilters[i];
+var elementKey = currentNode.childNodes[0].value;
+var operatorType = currentNode.childNodes[1].value;
+var inputValue = currentNode.childNodes[2].value;
+
+if(elementKey == "")
+{
+continue;
+}
+
+switch(operatorType){
+case "Equals":
+matches = matches.equals(elementKey, inputValue);
+break;
+case "Is Greater Than":
+matches = matches.isGreaterThan(elementKey, inputValue);
+break;
+case "Is Less Than":
+matches = matches.isLessThan(elementKey, inputValue);
+break;
+default:
+console.log("unknown operator" + operator);
+break;
+}
+}
+
+document.getElementById("queryResults").innerHTML= JSON.stringify(matches.transactionsDatabase);
+
+return;
+}
+
+</script>
+</body>
+</html>
