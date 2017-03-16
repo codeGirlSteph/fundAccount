@@ -1,0 +1,56 @@
+
+public class ExecuteMain {
+	
+	 static int leftSubArray[];
+	 static int rightSubArray[];
+	
+	public static void mergeSort(int[] array){
+		
+	    //find the size of the parent array 
+	    int sizeOfArray=array.length;
+	  //if array has length greater than 1, divide
+	    if(sizeOfArray > 1){
+	   //break down the array into two sub arrays
+	    //find the middle of the parent array which returns an integer value without remainder so this integer value represents the number of elements in the left sub array
+	    int middleIndexOfParentArray = sizeOfArray/2;
+	    //find the number of elements in the right sub array 
+	    int elementsInRightArray=sizeOfArray- middleIndexOfParentArray;
+	//initialize the sub arrays to get it in memory since they will be used later
+	    leftSubArray=new int[middleIndexOfParentArray];
+	    rightSubArray=new int[elementsInRightArray];
+	    
+	    for (int left=0;left< middleIndexOfParentArray;left++){
+	        leftSubArray[left]=array[left];
+	       
+	    }
+	    
+	   //The parent array’s indexes are greater than the left sub array’s indexes by the value of the middleIndexOfParentArray
+	    for (int right= middleIndexOfParentArray;right<sizeOfArray; right++){
+	        rightSubArray[right- middleIndexOfParentArray]=array[right];
+	    }
+	    //use recursion to break down the sub arrays until one element is left
+	    //mergeSort(leftSubArray);
+	    //mergeSort(rightSubArray);
+	    }
+	    
+	    
+	}
+
+
+	public static void main(String[] args) {
+	    mergeSort(new int[]{5,3,6,8});
+	    //mergeSort(leftSubArray);
+	    mergeSort(rightSubArray);
+	    for (int i:leftSubArray){
+	    	 System.out.println(i);
+	    }
+	    
+	    
+	    for (int i:rightSubArray){
+	    	 System.out.println(i);
+	    }
+	    
+	   
+	}
+
+}
